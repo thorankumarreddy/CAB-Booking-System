@@ -7,6 +7,7 @@ import com.cab.booking.cab.dto.User;
 public interface UserService {
 
     public String addUser(User user);
+    public User userdata(User user);
 
 
 }

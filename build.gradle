@@ -20,6 +20,15 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	runtimeOnly 'mysql:mysql-connector-java:5.1.+'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+	// JPA API
+	implementation 'javax.persistence:javax.persistence-api:2.2'
+	// JPA Implementation (e.g., Hibernate)
+	implementation 'org.hibernate:hibernate-core:5.6.0.Final'
+
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+
+
 }
 
 tasks.named('test') {

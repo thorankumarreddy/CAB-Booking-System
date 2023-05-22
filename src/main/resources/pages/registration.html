@@ -17,11 +17,11 @@
             var repwd = document.forms["myForm"]["reppsw"].value;
             var num = document.forms["myForm"]["contact"].value;
             if(isNaN(num)) {
-                alert("Enter  Numeric  value in Mobile field");
+                alert("Enter Numeric  value in Mobile field");
                 return false;
             }
             if(pwd.length < 5) {
-                alert("Password length must be atleast 8 characters");
+                alert("Password length must be atleast 5 characters");
                 return false;
             }
             if(pwd.length >10) {
@@ -52,12 +52,12 @@
                         <div class="row align-items-center pt-4 pb-3">
                             <div class="col-md-3 ps-5">
 
-                                <h6 class="mb-0">Full name</h6>
+                                <h6 class="mb-0">User name</h6>
 
                             </div>
                             <div class="col-md-9 pe-5">
 
-                                <input type="text" class="form-control form-control-lg" name="usrnm" required />
+                                <input type="text" class="form-control form-control-lg" placeholder="Enter the name" name="usrnm" required />
 
                             </div>
                         </div>

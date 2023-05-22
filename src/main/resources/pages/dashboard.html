@@ -1,0 +1,319 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>User Dashboard</title>
+<style>
+    .section_our_solution .row {
+        align-items: center;
+    }
+
+    .our_solution_category {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+    .our_solution_category .solution_cards_box {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+    .solution_cards_box .solution_card {
+        flex: 0 50%;
+        background: #fff;
+        box-shadow: 0 2px 4px 0 rgba(136, 144, 195, 0.2),
+        0 5px 15px 0 rgba(37, 44, 97, 0.15);
+        border-radius: 15px;
+        margin: 8px;
+        padding: 10px 15px;
+        position: relative;
+        z-index: 1;
+        overflow: hidden;
+        min-height: 265px;
+        transition: 0.7s;
+    }
+
+    .solution_cards_box .solution_card:hover {
+        background: #309df0;
+        color: #fff;
+        transform: scale(1.1);
+        z-index: 9;
+    }
+
+    .solution_cards_box .solution_card:hover::before {
+        background: rgb(85 108 214 / 10%);
+    }
+
+    .solution_cards_box .solution_card:hover .solu_title h3,
+    .solution_cards_box .solution_card:hover .solu_description p {
+        color: #fff;
+    }
+
+    .solution_cards_box .solution_card:before {
+        content: "";
+        position: absolute;
+        background: rgb(85 108 214 / 5%);
+        width: 170px;
+        height: 400px;
+        z-index: -1;
+        transform: rotate(42deg);
+        right: -56px;
+        top: -23px;
+        border-radius: 35px;
+    }
+
+    .solution_cards_box .solution_card:hover .solu_description button {
+        background: #fff !important;
+        color: #309df0;
+    }
+
+    .solution_card .so_top_icon {
+    }
+
+    .solution_card .solu_title h3 {
+        color: #212121;
+        font-size: 1.3rem;
+        margin-top: 13px;
+        margin-bottom: 13px;
+    }
+
+    .solution_card .solu_description p {
+        font-size: 15px;
+        margin-bottom: 15px;
+    }
+
+    .solution_card .solu_description button {
+        border: 0;
+        border-radius: 15px;
+        background: linear-gradient(
+                140deg,
+                #42c3ca 0%,
+                #42c3ca 50%,
+                #42c3cac7 75%
+        ) !important;
+        color: #fff;
+        font-weight: 500;
+        font-size: 1rem;
+        padding: 5px 16px;
+    }
+
+    .our_solution_content h1 {
+        text-transform: capitalize;
+        margin-bottom: 1rem;
+        font-size: 2.5rem;
+    }
+    .our_solution_content p {
+    }
+
+    .hover_color_bubble {
+        position: absolute;
+        background: rgb(54 81 207 / 15%);
+        width: 100rem;
+        height: 100rem;
+        left: 0;
+        right: 0;
+        z-index: -1;
+        top: 16rem;
+        border-radius: 50%;
+        transform: rotate(-36deg);
+        left: -18rem;
+        transition: 0.7s;
+    }
+
+    .solution_cards_box .solution_card:hover .hover_color_bubble {
+        top: 0rem;
+    }
+
+    .solution_cards_box .solution_card .so_top_icon {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        background: #fff;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .solution_cards_box .solution_card .so_top_icon img {
+        width: 100px;
+        height: 100px;
+        object-fit: contain;
+    }
+
+    /*start media query*/
+    @media screen and (min-width: 320px) {
+        .sol_card_top_3 {
+            position: relative;
+            top: 0;
+        }
+
+        .our_solution_category {
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        .our_solution_category .solution_cards_box {
+            flex: auto;
+        }
+    }
+    @media only screen and (min-width: 768px) {
+        .our_solution_category .solution_cards_box {
+            flex: 1;
+        }
+    }
+    @media only screen and (min-width: 1024px) {
+        .sol_card_top_3 {
+            position: relative;
+            top: -3rem;
+        }
+        .our_solution_category {
+            width: 50%;
+            margin: 0 auto;
+        }
+    }
+    @import url("https://fonts.googleapis.com/css?family=Lato:400,400i,700");
+
+    body {
+        margin: 0;
+        font-family: "Times New Roman", Times, serif;
+    }
+
+    .header {
+        min-height: 20vh;
+        background: #009FFF;
+        background: linear-gradient(to right, #ec2F4B, #009FFF);
+        color: white;
+        clip-path: ellipse(100vw 60vh at 50% 50%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .details {
+        text-align: center;
+    }
+
+    .profile-pic {
+        height: 6rem;
+        width: 6rem;
+        object-fit: center;
+        border-radius: 50%;
+        border: 2px solid #fff;
+    }
+
+    .location p {
+        display: inline-block;
+    }
+
+    .location svg {
+        vertical-align: middle;
+    }
+
+    #logout {
+        background-color: #F44336;
+        height: 40px;
+        text-align: right;
+        right: 40px;
+        position: fixed;
+    }
+
+    #logout {
+        vertical-align: top;
+    }
+
+</style>
+</head>
+<body>
+
+<section class="profile">
+    <header class="header">
+        <a href="/logout">
+        <img id="logout" src="https://cdn-icons-png.flaticon.com/128/4436/4436954.png" alt="Logout">
+        </a>
+        <div class="details">
+            <img src="https://cdn-icons-png.flaticon.com/128/3237/3237472.png" alt="User" class="profile-pic">
+                <h1>[[${user.username}]]</h1>
+                <h4>Email  :[[${user.email}]]</h4>
+                <h4>Contact:[[${user.contactNo}]]</h4>
+
+        </div>
+    </header>
+</section>
+
+<section class="vh-100" style="background: linear-gradient(to right, #ec2F4B, #009FFF);">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <br><br>
+<div class="section_our_solution">
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12">
+            <div class="our_solution_category">
+                <div class="solution_cards_box">
+                    <div class="solution_card">
+                        <div class="hover_color_bubble"></div>
+
+                        <div class="so_top_icon">
+                            <img src="https://cdn-icons-png.flaticon.com/128/7828/7828077.png" alt="Cab">
+                        </div>
+                        <div class="solu_title">
+                            <h3>Book a Cab</h3>
+                        </div>
+                        <div class="solu_description">
+
+                            <button type="button" class="read_more_btn">Go!!</button>
+                        </div>
+                    </div>
+                    <div class="solution_card">
+                        <div class="hover_color_bubble"></div>
+                        <div class="so_top_icon">
+                            <img src="https://cdn-icons-png.flaticon.com/128/684/684908.png" alt="Tracking">
+                        </div>
+                        <div class="solu_title">
+                            <h3>Where is my Cab??</h3>
+                        </div>
+                        <div class="solu_description">
+
+                            <button type="button" class="read_more_btn">Track it!!</button>
+                        </div>
+                    </div>
+                </div>
+                <!--  -->
+                <div class="solution_cards_box sol_card_top_3">
+                    <div class="solution_card">
+                        <div class="hover_color_bubble"></div>
+                        <div class="so_top_icon">
+                            <img src="https://cdn-icons-png.flaticon.com/128/2666/2666505.png" alt="Cab">
+                        </div>
+                        <div class="solu_title">
+                            <h3>Your bookings so far</h3>
+                        </div>
+                        <div class="solu_description">
+
+                            <button type="button" class="read_more_btn">See here!!</button>
+                        </div>
+                    </div>
+                    <div class="solution_card">
+                        <div class="hover_color_bubble"></div>
+                        <div class="so_top_icon">
+                            <img src="https://cdn-icons-png.flaticon.com/128/2839/2839172.png" alt="Cab">
+                        </div>
+                        <div class="solu_title">
+                            <h3>How was your Experience?</h3>
+                        </div>
+                        <div class="solu_description">
+
+                            <button type="button" class="read_more_btn">Rate Us!!</button>
+                        </div>
+                    </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</section>
+</body>
+</html>

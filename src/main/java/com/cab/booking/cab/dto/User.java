@@ -1,10 +1,13 @@
 package com.cab.booking.cab.dto;
+import java.lang.reflect.Field;
 
 public class User {
     private String username;
     private String email;
     private String contactNo;
     private String password;
+
+
 
     public User() {
     }
@@ -47,4 +50,35 @@ public class User {
     public void setPassword(String password) {
         this.password = password;
     }
+
+    public boolean isNull() {
+        Field fields[] = this.getClass().getDeclaredFields();
+        for (Field f : fields) {
+            try {
+                Object value = f.get(this);
+                if (value != null) {
+                    return false;
+                }
+            }
+            catch (IllegalArgumentException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+            catch (IllegalAccessException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+
+
+        }
+        return true;
+
+    }
+//    public String getValidate() {
+//        return validate;
+//    }
+//
+//    public void setValidate(String validate) {
+//        this.validate = validate;
+//    }
 }

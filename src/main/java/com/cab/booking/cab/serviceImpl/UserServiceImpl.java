@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 
 
-
 @Service
 public class UserServiceImpl implements UserService{
 
@@ -31,6 +30,47 @@ public class UserServiceImpl implements UserService{
         }
 
     }
+
+
+    public User userdata(User user){
+
+        User data=new User();
+        String select_query="SELECT * FROM USER_LOGIN WHERE USERNAME=? AND PASSWORD=?;";
+         jdbcTemplate.query(select_query,new Object[]{user.getUsername(),user.getPassword()},rs ->{
+
+                    data.setUsername(rs.getString("USERNAME"));
+                    data.setEmail(rs.getString("EMAIL"));
+                    data.setContactNo(rs.getString("CONTACT"));
+
+
+                });
+        return data;
+    }
+
+//    public String loginUser(User user){
+//        //insert query
+//        String select_query="SELECT COUNT(*) FROM USER_LOGIN WHERE USERNAME=? AND PASSWORD=?;";
+//
+//        String rows=jdbcTemplate.queryForObject(select_query,new Object[]{user.getUsername(),user.getPassword()},String.class);
+//        int result=Integer.valueOf(rows);
+//        if(result==1){
+//            return "valid";
+//        }else{
+//            return "invalid";
+//        }
+//
+//    }
+
+
+
+//
+//    public List<User> userDetails(User user){
+//        List<User> details = new ArrayList<>();
+//        String select_query="SELECT COUNT(*) FROM USER_LOGIN WHERE USERNAME=? AND PASSWORD=?;";
+//        details=jdbcTemplate.queryForList(select_query,new Object[]{user.getUsername(),user.getPassword()},User.class);
+//        return details;
+//
+//    }
 
 
 }
