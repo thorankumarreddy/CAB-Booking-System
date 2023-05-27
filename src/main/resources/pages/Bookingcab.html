@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Cab Booking</title>
+</head>
+<body>
+
+<h1>Cab Booking</h1>
+<section class="vh-100" style="background-color: #ffeb3bb0;">
+<form id="bookingForm">
+
+    <fieldset>
+        <legend>Profile Details</legend>
+
+            <h6>Name:</h6>
+             <h6>Email:</h6>
+            <h6>Contact:</h6>
+
+
+    </fieldset>
+<br><br>
+    <fieldset>
+        <legend>Pick Up and Drop Off Details</legend>
+        <div>
+            <label for="pickup">Pick Up Location:</label>
+            <input type="text" id="pickup" required>
+        </div>
+        <div>
+            <label for="dropoff">Drop Off Location:</label>
+            <select id="dropoff" required>
+                <option value="">Select an option</option>
+                <option value="Location 1">Location 1</option>
+                <option value="Location 2">Location 2</option>
+                <option value="Location 3">Location 3</option>
+                <option value="Location 4">Location 4</option>
+                <option value="Location 5">Location 5</option>
+            </select>
+        </div>
+        <div>
+            <label for="date">Date:</label>
+            <input type="date" id="date" required>
+        </div>
+        <div>
+            <label for="time">Time:</label>
+            <input type="time" id="time" required>
+        </div>
+        <div>
+            <label for="cabType">Type of Cab:</label>
+            <select id="cabType" required>
+                <option value="">Select an option</option>
+                <option value="Cab 1">Cab 1</option>
+                <option value="Cab 2">Cab 2</option>
+                <option value="Cab 3">Cab 3</option>
+
+            </select>
+        </div>
+    </fieldset>
+    <br><br>
+    <fieldset>
+        <legend>Payment Details</legend>
+        <div>
+            <input type="radio" id="creditCard" name="paymentMethod" value="Credit Card">
+            <label for="creditCard">Credit Card</label>
+        </div>
+        <div>
+            <input type="radio" id="debitCard" name="paymentMethod" value="Debit Card">
+            <label for="debitCard">Debit Card</label>
+        </div>
+        <div id="cardDetails" style="display: none;">
+            <div>
+                <label for="cardNo">Card Number:</label>
+                <input type="text" id="cardNo">
+            </div>
+            <div>
+                <label for="cvv">CVV:</label>
+                <input type="text" id="cvv">
+            </div>
+            <div>
+                <label for="expiryDate">Expiry Date:</label>
+                <input type="text" id="expiryDate">
+            </div>
+            <div>
+                <label for="fullName">Full Name:</label>
+                <input type="text" id="fullName">
+            </div>
+        </div>
+    </fieldset>
+
+    <br><br>
+    <button type="submit">Book Cab</button>
+</form>
+</section>
+<script>
+       document.addEventListener('DOMContentLoaded', function() {
+          const paymentMethodRadios = document.querySelectorAll('input[name="paymentMethod"]');
+          const cardDetailsContainer = document.getElementById('cardDetails');
+
+          paymentMethodRadios.forEach(function(radio) {
+             radio.addEventListener('change', function() {
+                if (this.value === 'Credit Card' || this.value === 'Debit Card') {
+                   cardDetailsContainer.style.display = 'block';
+                } else {
+                   cardDetailsContainer.style.display = 'none';
+                }
+             });
+          });
+
+          document.getElementById('bookingForm').addEventListener('submit', function(event) {
+             event.preventDefault();
+             // Generate a booking ID and store the form data in the booking table
+             const bookingId = generateBookingId();
+             const formData = {
+                name: document.getElementById('name').value,
+                pickup: document.getElementById('pickup').value,
+                dropoff: document.getElementById('dropoff').value,
+                date: document.getElementById('date').value,
+                time: document.getElementById('time').value,
+                cabType: document.getElementById('cabType').value,
+                bookingId: bookingId,
+                driverName: '' // Assign driver name here
+             };
+             storeBookingData(formData);
+
+             // Store payment details in the payment table
+             const paymentDetails = {
+                username: formData.name,
+                bookingId: bookingId,
+                paymentMethod: document.querySelector('input[name="paymentMethod"]:checked').value,
+                cardNo: document.getElementById('cardNo').value,
+                cvv: document.getElementById('cvv').value,
+                expiryDate: document.getElementById('expiryDate').value,
+                fullName: document.getElementById('fullName').value
+             };
+             storePaymentDetails(paymentDetails);
+
+             alert('Cab booked successfully. Your booking ID is: ' + bookingId);
+             this.reset();
+          });
+       });
+
+       function generateBookingId() {
+          // Generate a random 6-digit booking ID
+          return Math.floor(100000 + Math.random() * 900000);
+       }
+
+       function storeBookingData(formData) {
+          // Perform an AJAX request to store the booking data in the backend (not included in this example)
+          console.log(formData);
+       }
+
+       function storePaymentDetails(paymentDetails) {
+          // Perform an AJAX request to store the payment details in the backend (not included in this example)
+          console.log(paymentDetails);
+       }
+</script>
+
+</body>
+</html>

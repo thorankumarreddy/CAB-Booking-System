@@ -9,6 +9,9 @@ import javax.servlet.http.HttpServletRequest;
 import org.springframework.ui.Model;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Cookie;
+import com.cab.booking.cab.dto.Driver;
+import java.util.ArrayList;
+import java.util.List;
 
 
 
@@ -25,6 +28,12 @@ public class UserController {
     public String login() {
 
         return "login.html";
+    }
+
+    @RequestMapping("/index")
+    public String index() {
+
+        return "index.html";
     }
 
     @RequestMapping("/logout")
@@ -73,13 +82,39 @@ public class UserController {
             return "dashboard.html";
         }
 
+    }
 
+    @RequestMapping(path="/status-Update",method=RequestMethod.POST)
+    public void statusUpdate(HttpServletRequest request,Model model, HttpServletResponse response){
+
+        String id=request.getParameter("buttonid");
+        String tripId=request.getParameter("tripId");
+        String driver=request.getParameter("driver");
+        String status="";
+        if(id.equals("arrive")){
+            status="Arrived";
+        }
+        if(id.equals("start")){
+            status="Ongoing";
+        }if(id.equals("completed")){
+            status="Completed";
+        }
+        userService.statusUpdate(status,tripId,driver);
 
     }
 
+    @RequestMapping("/logindriver")
+    public String loginDriver() {
+        return "logindriver.html";
+    }
 
     @RequestMapping("/driver")
-    public String driver() {
+    public String driver(HttpServletRequest request,Model model) {
+        Driver login=new Driver();
+        login.setDrivername(request.getParameter("name"));
+        login.setPassword(request.getParameter("passwrd"));
+        Driver driver=userService.driverData(login);
+        model.addAttribute("driver", driver);
         return "driver.html";
     }
 
@@ -89,9 +124,44 @@ public class UserController {
     }
 
     @RequestMapping("/triptracker")
-    public String triptracker() {
+    public String triptracker(HttpServletRequest request,Model model) {
+        User user=new User();
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                user.setUsername(cookie.getValue());
+            }
+        }
+        user.setBookid(request.getParameter("id"));
+        User ride= userService.trackRide(user);
+        model.addAttribute("ride", ride);
+        model.addAttribute("tripId", ride.getBookid());
         return "triptracker.html";
     }
+
+
+    @RequestMapping("/bookCab")
+    public String bookCab(HttpServletRequest request,Model model) {
+
+        return "Bookingcab.html";
+    }
+
+    @RequestMapping("/ridetrack")
+    public String ridetrack(HttpServletRequest request,Model model) {
+
+        return "ridetrack.html";
+    }
+
+    @RequestMapping("/bookings")
+    public String bookingsList(HttpServletRequest request,Model model) {
+
+        String username=request.getParameter("username");
+        List<User>bookings=userService.bookings(username);
+        model.addAttribute("bookings", bookings);
+
+        return "rideBookings.html";
+    }
+
 
 
 }

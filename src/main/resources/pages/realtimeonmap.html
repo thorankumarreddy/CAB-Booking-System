@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Live Location Changes</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        #map {
+            height: 400px;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+<h1>Live Location Changes</h1>
+<div id="map"></div>
+<div id="locationUpdates"></div>
+
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAYg2oLfY0q0bLZTUGS--yAPsfWVw-l7Pw&callback=initMap" async
+        defer></script>
+
+<script>
+    var map;
+    var marker;
+
+    function initMap() {
+        var mapOptions = {
+            center: {lat: 0, lng: 0},
+            zoom: 10,
+            mapId: 'f59bf37bc81d63ab'
+        };
+        map = new google.maps.Map(document.getElementById('map'), mapOptions);
+    }
+
+    $(document).ready(function () {
+        // Check if the Geolocation API is available
+        if ("geolocation" in navigator) {
+            // Watch for changes in the user's location
+            var watchId = navigator.geolocation.watchPosition(successCallback, errorCallback);
+        } else {
+            $("#map").text("Geolocation is not supported by this browser.");
+        }
+
+        function successCallback(position) {
+            var latitude = position.coords.latitude;
+            var longitude = position.coords.longitude;
+            var timestamp = new Date(position.timestamp).toLocaleString();
+
+
+            // Update the map marker
+            var newLatLng = new google.maps.LatLng(latitude, longitude);
+            if (!marker) {
+                marker = new google.maps.Marker({
+                    position: newLatLng,
+                    map: map,
+                    title: "Current Location"
+                });
+
+            } else {
+                marker.setPosition(newLatLng);
+            }
+
+            // Center the map on the updated location
+            map.setCenter(newLatLng);
+
+            // Append the location changes to the div
+            var locationUpdate = "<p>Latitude: " + latitude + ", Longitude: " + longitude + ", Timestamp: " + timestamp + "</p>";
+            $("#locationUpdates").append(locationUpdate);
+
+        }
+
+        function errorCallback(error) {
+            switch (error.code) {
+                case error.PERMISSION_DENIED:
+                    $("#map").text("User denied the request for Geolocation.");
+                    break;
+                case error.POSITION_UNAVAILABLE:
+                    $("#map").text("Location information is unavailable.");
+                    break;
+                case error.TIMEOUT:
+                    $("#map").text("The request to get user location timed out.");
+                    break;
+                case error.UNKNOWN_ERROR:
+                    $("#map").text("An unknown error occurred.");
+                    break;
+            }
+        }
+    });
+</script>
+
+</body>
+</html>
