@@ -87,20 +87,10 @@ public class UserController {
     @RequestMapping(path="/status-Update",method=RequestMethod.POST)
     public void statusUpdate(HttpServletRequest request,Model model, HttpServletResponse response){
 
-        String id=request.getParameter("buttonid");
         String tripId=request.getParameter("tripId");
         String driver=request.getParameter("driver");
-        String status="";
-        if(id.equals("arrive")){
-            status="Arrived";
-        }
-        if(id.equals("start")){
-            status="Ongoing";
-        }if(id.equals("completed")){
-            status="Completed";
-        }
+        String status = request.getParameter("status");
         userService.statusUpdate(status,tripId,driver);
-
     }
 
     @RequestMapping("/logindriver")

@@ -3,29 +3,43 @@
 <head>
     <title>Live Location Changes</title>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+
+
     <style>
         #map {
-            height: 400px;
-            width: 100%;
+            height: 600px;
+            width: 80%;
+            margin: 0 auto;
         }
+
+        body {
+            padding-top:20px;
+        }
+
     </style>
 </head>
-<body>
+<body style="text-align: center;">
 <div class="details">
 
-    <h4>Driver Assigned:[[${ride.driver}]]</h4>
-    <h4>Booking ID     :[[${ride.bookid}]]</h4>
-    <h4>Booking Date   :[[${ride.bookdate}]]</h4>
-    <h4>Type of CAB    :[[${ride.cabtype}]]</h4>
-    <h4>Pick Up        :[[${ride.pickup}]]</h4>
-    <h4>Drop           :[[${ride.drop}]]</h4>
+    <h2> Welcome to Cab booking service. Your trip details are below</h2>
+
+    <p>Driver Assigned:[[${ride.driver}]]</p>
+    <p>Booking ID     :[[${ride.bookid}]]</p>
+    <p>Booking Date   :[[${ride.bookdate}]]</p>
+    <p>Type of CAB    :[[${ride.cabtype}]]</p>
+    <p>Pick Up        :[[${ride.pickup}]]</p>
+    <p>Drop           :[[${ride.drop}]]</p>
 
 
-    <h4>pick up latitude  :[[${ride.pickLat}]]</h4>
-    <h4>pick up longitude :[[${ride.pickLong}]]</h4>
-    <h4>Drop latitude     :[[${ride.dropLat}]]</h4>
-    <h4>Drop Longitude    :[[${ride.dropLong}]]</h4>
+    <p>PickUp Latitude  :[[${ride.pickLat}]]</p>
+    <p>PickUp Longitude :[[${ride.pickLong}]]</p>
+    <p>Drop Latitude     :[[${ride.dropLat}]]</p>
+    <p>Drop Longitude    :[[${ride.dropLong}]]</p>
 
+    <p id="eta" class="text-primary" style="display:none;">Estimated Time of Arrival (ETA): </p>
+
+    <p id="tripStatusMsg" class="text-success"></p>
 </div>
 <div id="map"></div>
 <div id="locationUpdates"></div>
@@ -36,6 +50,9 @@
 <script>
     var map;
     var marker;
+    var directionsService;
+    var directionsRenderer;
+
     // var tripId = getQueryParam('tripId'); // Retrieve the tripId from URL parameter
     var tripId=[[${ride.bookid}]];
     function getQueryParam(param) {
@@ -51,16 +68,68 @@
         };
         map = new google.maps.Map(document.getElementById('map'), mapOptions);
 
+        // Retrieve pickup and drop latitude and longitude
+        var pickupLat = [[${ride.pickLat}]];
+        var pickupLng = [[${ride.pickLong}]];
+        var dropLat = [[${ride.dropLat}]];
+        var dropLng = [[${ride.dropLong}]];
+
+        // Create marker for pickup location
+        createMarker(pickupLat, pickupLng, "Pickup Location", "http://maps.google.com/mapfiles/ms/icons/blue-dot.png");
+
+        // Create marker for drop location
+        createMarker(dropLat, dropLng, "Drop Location", "https://maps.google.com/mapfiles/marker_black.png");
+
+        // Create LatLng objects for pickup and drop locations
+        var pickupLatLng = new google.maps.LatLng(pickupLat, pickupLng);
+        var dropLatLng = new google.maps.LatLng(dropLat, dropLng);
+
+        // Initialize directions service and renderer
+        directionsService = new google.maps.DirectionsService();
+        directionsRenderer = new google.maps.DirectionsRenderer({
+            map: map,
+            suppressMarkers: true // Suppress default markers
+        });
+
+
+        // Extend bounds with pickup and drop locations
+        var bounds = new google.maps.LatLngBounds();
+        bounds.extend(pickupLatLng);
+        bounds.extend(dropLatLng);
+
+        // Fit the map to the bounds
+        map.fitBounds(bounds);
+
         setInterval(getLocationHistory, 5000);
     }
 
+    function createMarker(latitude, longitude, title, iconUrl) {
+        var marker = new google.maps.Marker({
+            position: { lat: latitude, lng: longitude },
+            map: map,
+            title: title,
+            icon: {
+                url: iconUrl,
+                scaledSize: new google.maps.Size(32, 32)
+            }
+        });
+
+        var bounds = new google.maps.LatLngBounds();
+        bounds.extend(marker.getPosition());
+        map.fitBounds(bounds);
+    }
+
     function updateMarkers(locationList) {
+        var bounds = new google.maps.LatLngBounds(); // Create bounds object
+
+        // Extend bounds with pickup and drop locations
+        var pickupLatLng = new google.maps.LatLng([[${ride.pickLat}]], [[${ride.pickLong}]]);
+        var dropLatLng = new google.maps.LatLng([[${ride.dropLat}]], [[${ride.dropLong}]]);
+
         // Remove previous markers
         if (marker) {
             marker.setMap(null);
         }
-
-        var bounds = new google.maps.LatLngBounds(); // Create bounds object
 
 
         // Add new markers
@@ -72,26 +141,40 @@
                 title: "Location " + (i + 1)
             });
 
+            bounds.extend(pickupLatLng);
+            bounds.extend(dropLatLng);
             bounds.extend(marker.getPosition()); // Extend bounds with marker position
 
         }
 
+
         if (locationList.length > 0) {
             map.fitBounds(bounds); // Fit the map to the bounds
+
+            var loc = locationList[0];
+
+            var driverLocation = new google.maps.LatLng(loc.latitude, loc.longitude);
+            calculateETA(driverLocation, pickupLatLng); // Pass driver's location and pickup location
+
         }
 
     }
 
+
     function getLocationHistory() {
         $.ajax({
-            url: '/get-location-history?tripId=' + tripId, // Replace with your actual backend API endpoint
+            url: '/trip-status',
             method: 'GET',
+            data: { tripId: tripId },
+            dataType: 'json',
             success: function(response) {
-                var locationList = response;
-
+                var tripStatus = response;
+                var locationList = tripStatus.location;
+                var ride = tripStatus.ride;
                 if (locationList.length > 0) {
                     updateMarkers(locationList);
                 }
+                showTripStatusMsg(ride.rideStatus);
             },
             error: function(error) {
                 console.error('Error retrieving location history:', error);
@@ -99,84 +182,73 @@
         });
     }
 
+    /*function getLocationHistory() {
+        $.ajax({
+            url: '/trip-status?tripId=' + tripId, // Replace with your actual backend API endpoint
+            method: 'GET',
 
-   /* $(document).ready(function () {
-        // Check if the Geolocation API is available
-        if ("geolocation" in navigator) {
-            // Watch for changes in the user's location
-            var watchId = navigator.geolocation.watchPosition(successCallback, errorCallback);
-        } else {
-            $("#map").text("Geolocation is not supported by this browser.");
-        }
-
-        function successCallback(position) {
-            var latitude = position.coords.latitude;
-            var longitude = position.coords.longitude;
-            var timestamp = new Date(position.timestamp).toLocaleString();
-
-
-            // Update the map marker
-            var newLatLng = new google.maps.LatLng(latitude, longitude);
-            if (!marker) {
-                marker = new google.maps.Marker({
-                    position: newLatLng,
-                    map: map,
-                    title: "Current Location"
-                });
-
-            } else {
-                marker.setPosition(newLatLng);
-            }
-
-            // Center the map on the updated location
-            map.setCenter(newLatLng);
-
-            // Append the location changes to the div
-            var locationUpdate = "<p>Latitude: " + latitude + ", Longitude: " + longitude + ", Timestamp: " + timestamp + "</p>";
-            $("#locationUpdates").append(locationUpdate);
-
-        }
-
-        function errorCallback(error) {
-            switch (error.code) {
-                case error.PERMISSION_DENIED:
-                    $("#map").text("User denied the request for Geolocation.");
-                    break;
-                case error.POSITION_UNAVAILABLE:
-                    $("#map").text("Location information is unavailable.");
-                    break;
-                case error.TIMEOUT:
-                    $("#map").text("The request to get user location timed out.");
-                    break;
-                case error.UNKNOWN_ERROR:
-                    $("#map").text("An unknown error occurred.");
-                    break;
-            }
-        }
-
-
-        function getLocationHistory() {
-            $.ajax({
-                url: '/get-location-history?tripId=' + tripId, // Replace with your actual backend API endpoint
-                method: 'GET',
-                success: function(response) {
-                    var locationList = response;
-
-                    if (locationList.length > 0) {
-                        updateHeatmap(locationList);
-                    }
-                },
-                error: function(error) {
-                    console.error('Error retrieving location history:', error);
+            success: function(response) {
+                var tripStatus = response;
+                var locationList = tripStatus.location;
+                var ride = tripStatus.ride;
+                if (locationList.length > 0) {
+                    updateMarkers(locationList);
                 }
-            });
+                showTripStatusMsg(ride.rideStatus);
+            },
+            error: function(error) {
+                console.error('Error retrieving location history:', error);
+            }
+        });
+    }*/
+
+    function calculateETA(origin, destination) {
+        var request = {
+            origin: origin,
+            destination: destination,
+            travelMode: google.maps.TravelMode.DRIVING
+        };
+
+        directionsService.route(request, function(response, status) {
+            if (status === google.maps.DirectionsStatus.OK) {
+                var route = response.routes[0];
+                var leg = route.legs[0];
+                var etaText = leg.duration.text;
+
+                $("#eta").text("Estimated Time of Arrival (ETA): " + etaText)
+                $("#eta").show();
+                // Display ETA on the page
+                // document.getElementById("eta").textContent = "ETA: " + etaText;
+
+                // Display route on the map
+                directionsRenderer.setDirections(response);
+            } else {
+                console.error('Error calculating ETA:', status);
+            }
+        });
+    }
+
+    function showTripStatusMsg(rideStatus) {
+        var tripStatusMsg = $("#tripStatusMsg");
+        if (rideStatus === "upcoming") {
+            // Display message for upcoming trip
+            tripStatusMsg.text("Your trip is upcoming. Please be ready for pickup.");
+        } else if (rideStatus === "arrived") {
+            // Display message for driver arrival
+            tripStatusMsg.text("Your driver has arrived. Please proceed to the pickup location.");
+        } else if (rideStatus === "ongoing") {
+            // Display message for ongoing trip
+            tripStatusMsg.text("Your trip is in progress. Sit back and enjoy the ride.");
+        } else if (rideStatus === "completed") {
+            // Display message for completed trip
+            tripStatusMsg.text("Your trip has been completed. Thank you for riding with us!");
+        } else {
+            // Handle invalid ride status
+            tripStatusMsg.text("Invalid ride status. Please contact customer support.");
         }
+    }
 
 
-        setInterval(function() {
-            getLocationHistory();
-        }, 5000);
-    });*/
 </script>
 
 </body>

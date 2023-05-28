@@ -3,16 +3,40 @@
 <head>
     <title>Location Tracking</title>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
 </head>
-<body>
-<div id="locationUpdates"></div>
+<body style="text-align: center;">
 <h2> Welcome [[${driver.drivername}]]...You have a ride with booking Id :[[${driver.bookId}]] </h2>
+
+<div class="details">
+
+    <p>Booking ID : [[${driver.bookId}]]</p>
+    <p>Ride Status : [[${driver.rideStatus}]]</p>
+    <p>Pick up latitude : [[${driver.pickLat}]]</p>
+    <p>Pick up longitude : [[${driver.pickLong}]]</p>
+    <p>Drop latitude : [[${driver.dropLat}]]</p>
+    <p>Drop Longitude : [[${driver.dropLong}]]</p>
+    <p id="tripStatusMsg" class="text-info"></p>
+
+</div>
+
+<button class="btn btn-primary" id="arrived" onclick="sendAjaxRequest(statusUpdateUrl, 'arrived')">Arrived</button>
+<button class="btn btn-warning" id="ongoing" style="display:none;"
+        onclick="sendAjaxRequest(statusUpdateUrl, 'ongoing')">Start Trip
+</button>
+<button class="btn btn-success" id="completed" style="display:none;"
+        onclick="sendAjaxRequest(statusUpdateUrl, 'completed')">Complete Trip
+</button>
+<button class="btn btn-secondary" disabled id="done" style="display:none;">Trip Done</button>
+
+<h3>Driver Location Updates</h3>
+<div id="locationUpdates"></div>
 
 <script>
     var previousLocation = null;
+    var statusUpdateUrl = '/status-Update';
     //changes by manju--commented
-     //var tripId = getQueryParam('tripId'); // Retrieve the tripId from URL parameter
+    //var tripId = getQueryParam('tripId'); // Retrieve the tripId from URL parameter
     // var status = getQueryParam('status');
     // var driver = getQueryParam('driver');
     // function getQueryParam(param) {
@@ -20,14 +44,39 @@
     //     return urlParams.get(param);
     // }
 
-    var tripId=[[${driver.bookId}]];
-    var status="[[${driver.rideStatus}]]";
-    var driver="[[${driver.drivername}]]";
-    var pickLat=[[${driver.pickLat}]];
-    var pickLong=[[${driver.pickLong}]];
-    var dropLat=[[${driver.dropLat}]];
-    var dropLong=[[${driver.dropLong}]];
 
+    //added by manju for status update
+    function sendAjaxRequest(urlToSend, tripStatus) {
+        // var clickedButton = element;
+        // console.log('clickedButton value is');
+        // console.log(element);
+        $.ajax({
+            type: "POST",
+            url: urlToSend,
+            data: {
+                status: tripStatus,
+                tripId: tripId,
+                driver: driver
+            },
+            success: function (result) {
+                // alert('ok');
+                showStatusButtons(tripStatus);
+                showTripStatusMsg(tripStatus);
+            },
+            error: function (error) {
+                alert('error');
+            }
+        });
+    }
+
+
+    var tripId = [[${driver.bookId}]];
+    var status = "[[${driver.rideStatus}]]";
+    var driver = "[[${driver.drivername}]]";
+    var pickLat = [[${driver.pickLat}]];
+    var pickLong = [[${driver.pickLong}]];
+    var dropLat = [[${driver.dropLat}]];
+    var dropLong = [[${driver.dropLong}]];
 
 
     // Function to send AJAX request and save location data
@@ -51,11 +100,11 @@
                 method: 'POST',
                 contentType: 'application/json',
                 data: JSON.stringify(locationData),
-                success: function(response) {
+                success: function (response) {
                     console.log('Location data saved successfully!');
                     previousLocation = locationData; // Update previous location
                 },
-                error: function(error) {
+                error: function (error) {
                     console.error('Error saving location data:', error);
                 }
             });
@@ -65,20 +114,17 @@
 
     // Function to track location changes
     function trackLocation() {
-
-
         if (navigator.geolocation) {
             navigator.geolocation.watchPosition(
-                function(position) {
+                function (position) {
                     var latitude = position.coords.latitude;
                     var longitude = position.coords.longitude;
-                    $('#locationUpdates').append('<p>Latitude: ' + latitude + ', Longitude: ' + longitude + ', TripId: ' + tripId+ '</p>');
-
+                    $('#locationUpdates').append('<p>Latitude: ' + latitude + ', Longitude: ' + longitude + ', TripId: ' + tripId + '</p>');
                     // Call the function to save the location data
                     saveLocation(latitude, longitude, tripId);
 
                 },
-                function(error) {
+                function (error) {
                     console.error('Error getting location:', error);
                 }
             );
@@ -89,14 +135,62 @@
 
 
     // Start tracking location when the page loads
-    $(document).ready(function() {
+    $(document).ready(function () {
         trackLocation();
-
+        var rideStatus = "[[${driver.rideStatus}]]";
+        showStatusButtons(rideStatus);
+        showTripStatusMsg(rideStatus);
     });
 
+    function showStatusButtons(tripStatus) {
+        // Show/hide buttons based on the ride status
+        if (tripStatus === "upcoming") {
+            $("#arrived").show();
+            $("#ongoing").hide();
+            $("#completed").hide();
+        } else if (tripStatus === "arrived") {
+            $("#arrived").hide();
+            $("#ongoing").show();
+            $("#completed").hide();
+        } else if (tripStatus === "ongoing") {
+            $("#arrived").hide();
+            $("#ongoing").hide();
+            $("#completed").show();
+        } else if (tripStatus === "completed") {
+            $("#arrived").hide();
+            $("#ongoing").hide();
+            $("#completed").hide();
+            $("#done").show();
+        } else {
+            $("#arrived").hide();
+            $("#ongoing").hide();
+            $("#completed").hide();
+        }
+    }
+
+    function showTripStatusMsg(tripStatus) {
+        var tripStatusMsg = $("#tripStatusMsg");
+        if (tripStatus === "upcoming") {
+            // Display message for upcoming trip
+            tripStatusMsg.text("Your next trip is upcoming. Please prepare for pickup.");
+        } else if (tripStatus === "arrived") {
+            // Display message for driver arrival
+            tripStatusMsg.text("You have arrived at the pickup location. Please wait for the passenger.");
+        } else if (tripStatus === "ongoing") {
+            // Display message for ongoing trip
+            tripStatusMsg.text("You are currently on a trip. Drive safely and follow the navigation instructions.");
+        } else if (tripStatus === "completed") {
+            // Display message for completed trip
+            tripStatusMsg.text("You have completed the trip. Thank you for driving with us!");
+        } else {
+            // Handle invalid ride status
+            tripStatusMsg.text("Invalid ride status. Please contact customer support.");
+        }
+    }
+
+
+
 </script>
-
-
 
 </body>
 </html>
