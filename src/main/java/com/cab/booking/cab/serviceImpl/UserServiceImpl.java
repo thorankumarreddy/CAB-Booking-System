@@ -115,12 +115,17 @@ public class UserServiceImpl implements UserService {
 
     public Driver driverData(Driver login) {
 
-//        String select_query="SELECT COUNT(*) FROM DRIVER_LOGIN WHERE DRIVER_NAME=? AND PASSWORD=?;";
-//       String msg= jdbcTemplate.queryForObject(
-//                select_query,new Object[]{login.getDrivername(),login.getPassword()},String.class);
-//       System.out.println("msg is "+msg);
         Driver data = new Driver();
-//        if(Integer.valueOf(msg)==1){
+        String query="SELECT COUNT(*) as count FROM DRIVER_LOGIN WHERE DRIVER_NAME=? AND PASSWORD=? ;";
+        jdbcTemplate.query(query,new Object[]{login.getDrivername(),login.getPassword()},rs ->{
+
+            data.setCount(rs.getInt("count"));
+
+        });
+
+
+      if(data.getCount()==1){
+
         String details = "SELECT * FROM CAB_BOOKING WHERE BOOK_STATUS='upcoming' AND DRIVER=?;";
         jdbcTemplate.query(details, new Object[]{login.getDrivername()}, rs -> {
 
@@ -145,7 +150,7 @@ public class UserServiceImpl implements UserService {
             data.setDropLong(rs.getString("longitude"));
         });
 
-        //}
+        }
 
         return data;
 

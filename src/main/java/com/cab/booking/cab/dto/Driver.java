@@ -11,6 +11,7 @@ public class Driver {
     private String pickLong;
     private String dropLat;
     private String dropLong;
+    private  int count;
 
     public String getDrivername() {
         return drivername;
@@ -90,5 +91,13 @@ public class Driver {
 
     public void setDropLong(String dropLong) {
         this.dropLong = dropLong;
+    }
+
+    public int getCount() {
+        return count;
+    }
+
+    public void setCount(int count) {
+        this.count = count;
     }
 }

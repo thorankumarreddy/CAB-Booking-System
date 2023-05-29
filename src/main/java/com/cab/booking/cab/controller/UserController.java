@@ -130,12 +130,6 @@ public class UserController {
     }
 
 
-    @RequestMapping("/bookCab")
-    public String bookCab(HttpServletRequest request,Model model) {
-
-        return "Bookingcab.html";
-    }
-
     @RequestMapping("/ridetrack")
     public String ridetrack(HttpServletRequest request,Model model) {
 

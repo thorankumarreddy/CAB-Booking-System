@@ -2,157 +2,315 @@
 <html>
 <head>
     <title>Cab Booking</title>
-</head>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" crossorigin="anonymous">
+    <style>
+        .text-white{
+            margin-top:20px;
+            font-family: "Times New Roman", Times, serif;
+        }
+    </style>
+    </head>
 <body>
+<section class="vh-100" style="background-color: #9c27b099;">
+    <form name="bookingForm" action="/cab-details" method="POST" >
+        <div class="container h-100">
+            <div class="row d-flex justify-content-center align-items-center h-100">
+                <div class="col-xl-9">
 
-<h1>Cab Booking</h1>
-<section class="vh-100" style="background-color: #ffeb3bb0;">
-<form id="bookingForm">
+                    <h1 class="text-white mb-4">Book Your Cab</h1>
 
-    <fieldset>
-        <legend>Profile Details</legend>
+                    <div class="card" style="border-radius: 15px;">
+                        <div class="card-body">
 
-            <h6>Name:</h6>
-             <h6>Email:</h6>
-            <h6>Contact:</h6>
+                            <div class="row align-items-center pt-4 pb-3">
+                                <div class="col-md-3 ps-5">
+
+                                    <h6 class="mb-0">Pick Up Location: </h6>
+                                </div>
+
+                                <div class="col-md-9 pe-5">
+                                    <select name="pickup" required>
+                                        <option value="">Select an option</option>
+                                        <option value="frontyard">Frontyard</option>
+                                        <option value="backyard">Backyard</option>
+                                        <!--            	<option value="Location 3">Location 3</option>-->
+                                        <!--            	<option value="Location 4">Location 4</option>-->
+                                        <!--            	<option value="Location 5">Location 5</option>-->
+                                    </select>
+                                </div>
+
+                            </div>
+
+                            <div class="row align-items-center pt-4 pb-3">
+
+                                <div class="col-md-3 ps-5">
+                                    <h6 class="mb-0">Drop Off Location: </h6>
+                                </div>
+
+                                <div class="col-md-9 pe-5">
+                                    <select name="dropoff" required>
+                                        <option value="">Select an option</option>
+                                        <option value="frontyard">Frontyard</option>
+                                        <option value="backyard">Backyard</option>
+                                        <!--            	<option value="Location 3">Location 3</option>-->
+                                        <!--            	<option value="Location 4">Location 4</option>-->
+                                        <!--            	<option value="Location 5">Location 5</option>-->
+                                    </select>
+                                </div>
+
+                            </div>
+
+                            <hr class="mx-n3">
+
+                            <div class="row align-items-center py-3">
+                                <div class="col-md-3 ps-5">
+
+                                    <h6 class="mb-0">Date:</h6>
+
+                                </div>
+                                <div class="col-md-9 pe-5">
+
+                                    <input type="date" id="date" name="date" required>
 
 
-    </fieldset>
-<br><br>
-    <fieldset>
-        <legend>Pick Up and Drop Off Details</legend>
-        <div>
-            <label for="pickup">Pick Up Location:</label>
-            <input type="text" id="pickup" required>
-        </div>
-        <div>
-            <label for="dropoff">Drop Off Location:</label>
-            <select id="dropoff" required>
-                <option value="">Select an option</option>
-                <option value="Location 1">Location 1</option>
-                <option value="Location 2">Location 2</option>
-                <option value="Location 3">Location 3</option>
-                <option value="Location 4">Location 4</option>
-                <option value="Location 5">Location 5</option>
-            </select>
-        </div>
-        <div>
-            <label for="date">Date:</label>
-            <input type="date" id="date" required>
-        </div>
-        <div>
-            <label for="time">Time:</label>
-            <input type="time" id="time" required>
-        </div>
-        <div>
-            <label for="cabType">Type of Cab:</label>
-            <select id="cabType" required>
-                <option value="">Select an option</option>
-                <option value="Cab 1">Cab 1</option>
-                <option value="Cab 2">Cab 2</option>
-                <option value="Cab 3">Cab 3</option>
+                                </div>
+                            </div>
 
-            </select>
-        </div>
-    </fieldset>
-    <br><br>
-    <fieldset>
-        <legend>Payment Details</legend>
-        <div>
-            <input type="radio" id="creditCard" name="paymentMethod" value="Credit Card">
-            <label for="creditCard">Credit Card</label>
-        </div>
-        <div>
-            <input type="radio" id="debitCard" name="paymentMethod" value="Debit Card">
-            <label for="debitCard">Debit Card</label>
-        </div>
-        <div id="cardDetails" style="display: none;">
-            <div>
-                <label for="cardNo">Card Number:</label>
-                <input type="text" id="cardNo">
+
+
+                            <div class="row align-items-center py-3">
+                                <div class="col-md-3 ps-5">
+
+                                    <h6 class="mb-0">Time :</h6>
+
+                                </div>
+                                <div class="col-md-9 pe-5">
+
+                                    <input type="time" id="time" name="time"required>
+
+                                </div>
+                            </div>
+                            <hr class="mx-n3">
+
+                            <div class="row align-items-center py-3">
+                                <div class="col-md-3 ps-5">
+
+                                    <h6 class="mb-0">Type of cab:</h6>
+
+                                </div>
+                                <div class="col-md-9 pe-5">
+
+                                    <select name="cabtype" required>
+                                        <option value="">Select an option</option>
+                                        <option value="sedan">Sedan</option>
+                                        <option value="minivan">MiniVan</option>
+                                        <option value="suv">SUV</option>
+                                    </select>
+
+                                </div>
+                            </div>
+
+                            <hr class="mx-n3">
+
+
+                            <div class="row align-items-center py-3">
+                                <div class="col-md-3 ps-5">
+
+                                    <h6 class="mb-0">Payment Details</h6>
+
+                                </div>
+
+
+                            <div class="row align-items-center py-3">
+
+
+                                <div class="col-md-3 ps-5">
+                                    <input type="radio" id="creditcard" name="paymentmethod" value="creditcard">
+                                    <label for="creditcard">Credit Card</label>
+                                </div>
+
+                            </div>
+                            <div class="row align-items-center py-3">
+
+                                <div class="col-md-3 ps-5">
+                                    <input type="radio" id="cash" name="paymentmethod" value="cash" >
+                                    <label for="cash">Cash</label>
+
+                                </div>
+                            </div>
+                            <div class="row align-items-center py-3" id="cardDetails" name="cardDetails" style="display: none;">
+                                <div class="row align-items-center pt-4 pb-3">
+                                    <div class="col-md-3 ps-5">
+
+                                        <h6 class="mb-0">Card Number :</h6>
+
+                                    </div>
+                                    <div class="col-md-9 pe-5">
+                                    <input type="text" id="cardNo" name="cardNo" placeholder="Enter the Card number">
+                                    </div>
+                                </div>
+                                <div class="row align-items-center pt-4 pb-3">
+                                    <div class="col-md-3 ps-5">
+
+                                        <h6 class="mb-0">CVV :</h6>
+
+                                    </div>
+                                    <div class="col-md-9 pe-5">
+                                    <input type="text" id="cvv" name="cvv" placeholder="Enter the cvv">
+                                    </div>
+                                </div>
+                                <div class="row align-items-center pt-4 pb-3">
+                                    <div class="col-md-3 ps-5">
+
+                                        <h6 class="mb-0">Expiry Date :</h6>
+
+                                    </div>
+                                    <div class="col-md-9 pe-5">
+                                    <input type="text" id="expiryDate" name="expiryDate" placeholder="Enter the Expiry date">
+                                    </div>
+                                </div>
+                                <div class="row align-items-center pt-4 pb-3">
+                                    <div class="col-md-3 ps-5">
+
+                                        <h6 class="mb-0">Full Name :</h6>
+                                    </div>
+
+                                  <div class="col-md-9 pe-5">
+                                    <input type="text" id="fullName"  name="fullName" placeholder="Enter the Full Name">
+                                </div>
+                            </div>
+
+
+                            </div>
+                                <hr class="mx-n3">
+
+                                <div class="px-5 py-4">
+                                    <button type="submit" class="btn btn-primary btn-lg" onclick="validateForm()">Submit</button>
+                                </div>
+                        </div>
+                    </div>
+
+                </div>
             </div>
-            <div>
-                <label for="cvv">CVV:</label>
-                <input type="text" id="cvv">
             </div>
-            <div>
-                <label for="expiryDate">Expiry Date:</label>
-                <input type="text" id="expiryDate">
             </div>
-            <div>
-                <label for="fullName">Full Name:</label>
-                <input type="text" id="fullName">
-            </div>
-        </div>
-    </fieldset>
+    </form>
 
-    <br><br>
-    <button type="submit">Book Cab</button>
-</form>
+
+
 </section>
+</body>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe" crossorigin="anonymous"></script>
 <script>
-       document.addEventListener('DOMContentLoaded', function() {
-          const paymentMethodRadios = document.querySelectorAll('input[name="paymentMethod"]');
-          const cardDetailsContainer = document.getElementById('cardDetails');
+    var creditCardRadio = document.getElementById("creditcard");
+    var cashRadio = document.getElementById("cash");
+    var cardDetailsDiv = document.getElementById("cardDetails");
 
-          paymentMethodRadios.forEach(function(radio) {
-             radio.addEventListener('change', function() {
-                if (this.value === 'Credit Card' || this.value === 'Debit Card') {
-                   cardDetailsContainer.style.display = 'block';
-                } else {
-                   cardDetailsContainer.style.display = 'none';
+    creditCardRadio.addEventListener("change", function() {
+        if (creditCardRadio.checked) {
+            cardDetailsDiv.style.display = "block";
+        } else {
+            cardDetailsDiv.style.display = "none";
+        }
+        cashRadio.checked=false;
+    });
+
+    cashRadio.addEventListener("change", function() {
+
+        if (cashRadio.checked) {
+            cardDetailsDiv.style.display = "none";
+        } else {
+            cardDetailsDiv.style.display = "block";
+        }
+        creditCardRadio.checked=false;
+    });
+
+    function validateForm(){
+        var givenDate = document.getElementById("date").value;
+        var currentDate = new Date();
+
+        if (givenDate < currentDate) {
+            alert("The given date is invalid.");
+            return false;
+        }
+
+        var givenTime = document.getElementById("time").value;
+        var currentTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        if (givenTime < currentTime) {
+            alert("Given time is in the past.");
+            return false;
+        }
+
+        var creditCardRadio = document.getElementById("creditcard");
+        if (creditCardRadio.checked) {
+            var cardNumber = document.getElementById("cardNo").value;
+            var expiryDate = document.getElementById("expiryDate").value;
+            var cvv = document.getElementById("cvv").value;
+
+            // Card number validation (Luhn algorithm)
+            if (!validateCardNumber(cardNumber)) {
+                alert("Invalid card number");
+                return false;
+
+            }
+
+            // Expiry date validation
+            if (!validateExpiryDate(expiryDate)) {
+                alert("Invalid expiry date");
+                return false;
+
+            }
+
+            // CVV validation
+            if (!validateCVV(cvv)) {
+                alert("Invalid CVV");
+                return false;
+
+            }
+
+            // All payment details are valid
+            alert("Payment details are valid. Processing payment...");
+
+        }
+
+    }
+    function validateCardNumber(cardNumber) {
+        // Remove any non-digit characters from the card number
+        var cleanedCardNumber = cardNumber.replace(/\D/g, '');
+
+        // Perform card number validation using the Luhn algorithm
+        var sum = 0;
+        var doubleDigit = false;
+
+        for (var i = cleanedCardNumber.length - 1; i >= 0; i--) {
+            var digit = parseInt(cleanedCardNumber.charAt(i), 10);
+
+            if (doubleDigit) {
+                digit *= 2;
+                if (digit > 9) {
+                    digit -= 9;
                 }
-             });
-          });
+            }
 
-          document.getElementById('bookingForm').addEventListener('submit', function(event) {
-             event.preventDefault();
-             // Generate a booking ID and store the form data in the booking table
-             const bookingId = generateBookingId();
-             const formData = {
-                name: document.getElementById('name').value,
-                pickup: document.getElementById('pickup').value,
-                dropoff: document.getElementById('dropoff').value,
-                date: document.getElementById('date').value,
-                time: document.getElementById('time').value,
-                cabType: document.getElementById('cabType').value,
-                bookingId: bookingId,
-                driverName: '' // Assign driver name here
-             };
-             storeBookingData(formData);
+            sum += digit;
+            doubleDigit = !doubleDigit;
+        }
 
-             // Store payment details in the payment table
-             const paymentDetails = {
-                username: formData.name,
-                bookingId: bookingId,
-                paymentMethod: document.querySelector('input[name="paymentMethod"]:checked').value,
-                cardNo: document.getElementById('cardNo').value,
-                cvv: document.getElementById('cvv').value,
-                expiryDate: document.getElementById('expiryDate').value,
-                fullName: document.getElementById('fullName').value
-             };
-             storePaymentDetails(paymentDetails);
+        return (sum % 10) === 0;
+    }
+    function validateExpiryDate(expiryDate) {
+        // Expiry date should be in the format MM/YY
+        var pattern = /^(0[1-9]|1[0-2])\/?([0-9]{2})$/;
+        return pattern.test(expiryDate);
+    }
 
-             alert('Cab booked successfully. Your booking ID is: ' + bookingId);
-             this.reset();
-          });
-       });
+    function validateCVV(cvv) {
+        // CVV should be a 3 or 4-digit number
+        var pattern = /^[0-9]{3,4}$/;
+        return pattern.test(cvv);
+    }
 
-       function generateBookingId() {
-          // Generate a random 6-digit booking ID
-          return Math.floor(100000 + Math.random() * 900000);
-       }
 
-       function storeBookingData(formData) {
-          // Perform an AJAX request to store the booking data in the backend (not included in this example)
-          console.log(formData);
-       }
-
-       function storePaymentDetails(paymentDetails) {
-          // Perform an AJAX request to store the payment details in the backend (not included in this example)
-          console.log(paymentDetails);
-       }
 </script>
 
-</body>
 </html>

@@ -31,6 +31,7 @@ class FeedbackController {
         return "Feedback.html";
     }
 
+
     @RequestMapping(path="/submitFeedback",method= RequestMethod.POST)
     public String submitFeedback(HttpServletRequest request, Model model) {
 
@@ -38,7 +39,9 @@ class FeedbackController {
         Cookie[] cookies = request.getCookies();
         if (cookies != null) {
             for (Cookie cookie : cookies) {
-                feedback.setUsername(cookie.getValue());
+                if(cookie.getName().equals("name")) {
+                    feedback.setUsername(cookie.getValue());
+                }
             }
         }
         feedback.setBookingId(request.getParameter("bookid")); ;
