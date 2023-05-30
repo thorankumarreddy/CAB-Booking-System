@@ -12,7 +12,7 @@
     </head>
 <body>
 <section class="vh-100" style="background-color: #9c27b099;">
-    <form name="bookingForm" action="/cab-details" method="POST" >
+    <form name="bookingForm" action="/cab-details" method="POST" onsubmit="return validateForm()" >
         <div class="container h-100">
             <div class="row d-flex justify-content-center align-items-center h-100">
                 <div class="col-xl-9">
@@ -185,7 +185,7 @@
                                 <hr class="mx-n3">
 
                                 <div class="px-5 py-4">
-                                    <button type="submit" class="btn btn-primary btn-lg" onclick="validateForm()">Submit</button>
+                                    <button type="submit" class="btn btn-primary btn-lg">Submit</button>
                                 </div>
                         </div>
                     </div>
@@ -228,16 +228,14 @@
     function validateForm(){
         var givenDate = document.getElementById("date").value;
         var currentDate = new Date();
+        var year = currentDate.getFullYear();
+        var month = ("0" + (currentDate.getMonth() + 1)).slice(-2); // Adding leading zero if needed
+        var day = ("0" + currentDate.getDate()).slice(-2); // Adding leading zero if needed
 
-        if (givenDate < currentDate) {
+        var formattedDate = year + "-" + month + "-" + day;
+
+        if (givenDate < formattedDate) {
             alert("The given date is invalid.");
-            return false;
-        }
-
-        var givenTime = document.getElementById("time").value;
-        var currentTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-        if (givenTime < currentTime) {
-            alert("Given time is in the past.");
             return false;
         }
 

@@ -13,6 +13,6 @@ public interface UserService {
     public void statusUpdate(String status, String tripId, String driver);
     public User trackRide(User user);
     public Driver driverData(Driver login);
-    public List<User> bookings(String username);
+
     public User getCabBookingDetails(String tripId);
 }

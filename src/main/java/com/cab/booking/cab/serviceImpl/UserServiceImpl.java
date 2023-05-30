@@ -157,29 +157,6 @@ public class UserServiceImpl implements UserService {
     }
 
 
-    public List<User> bookings(String username) {
-
-        String select_query = "SELECT * FROM CAB_BOOKING WHERE USERNAME=?;";
-        List<Map<String, Object>> rows = jdbcTemplate.queryForList(select_query, username);
-        List<User> results = new ArrayList<>();
-        for (Map row : rows) {
-
-            User data = new User();
-            data.setUsername(username);
-            data.setPickup((String) row.get("PICK_UP"));
-            data.setDrop((String) row.get("DROP_LOC"));
-            data.setBookdate((Date) row.get("BOOK_DATE"));
-            data.setBookTime((String) row.get("BOOK_TIME"));
-            data.setCabtype((String) row.get("CAB_TYPE"));
-            data.setBookid((String) row.get("BOOKING_ID"));
-            data.setDriver((String) row.get("DRIVER"));
-            data.setRideStatus((String) row.get("BOOK_STATUS"));
-            results.add(data);
-        }
-
-        return results;
-
-    }
 
 
 //    public String loginUser(User user){

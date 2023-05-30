@@ -8,13 +8,13 @@
 
     <style>
         #map {
-            height: 800px;
-            width: 90%;
+            height: 600px;
+            width: 80%;
             margin: 0 auto;
         }
 
         body {
-            padding-top: 20px;
+            padding-top:20px;
         }
 
     </style>
@@ -25,17 +25,17 @@
     <h2> Welcome to Cab booking service. Your trip details are below</h2>
 
     <p>Driver Assigned:[[${ride.driver}]]</p>
-    <p>Booking ID :[[${ride.bookid}]]</p>
-    <p>Booking Date :[[${ride.bookdate}]]</p>
-    <p>Type of CAB :[[${ride.cabtype}]]</p>
-    <p>Pick Up :[[${ride.pickup}]]</p>
-    <p>Drop :[[${ride.drop}]]</p>
+    <p>Booking ID     :[[${ride.bookid}]]</p>
+    <p>Booking Date   :[[${ride.bookdate}]]</p>
+    <p>Type of CAB    :[[${ride.cabtype}]]</p>
+    <p>Pick Up        :[[${ride.pickup}]]</p>
+    <p>Drop           :[[${ride.drop}]]</p>
 
 
-    <p>PickUp Latitude :[[${ride.pickLat}]]</p>
+    <p>PickUp Latitude  :[[${ride.pickLat}]]</p>
     <p>PickUp Longitude :[[${ride.pickLong}]]</p>
-    <p>Drop Latitude :[[${ride.dropLat}]]</p>
-    <p>Drop Longitude :[[${ride.dropLong}]]</p>
+    <p>Drop Latitude     :[[${ride.dropLat}]]</p>
+    <p>Drop Longitude    :[[${ride.dropLong}]]</p>
 
     <p id="eta" class="text-primary" style="display:none;">Estimated Time of Arrival (ETA): </p>
 
@@ -57,8 +57,7 @@
     var directionsRenderer;
 
     // var tripId = getQueryParam('tripId'); // Retrieve the tripId from URL parameter
-    var tripId = [[${ride.bookid}]];
-
+    var tripId=[[${ride.bookid}]];
     function getQueryParam(param) {
         var urlParams = new URLSearchParams(window.location.search);
         return urlParams.get(param);
@@ -79,12 +78,10 @@
         var dropLng = [[${ride.dropLong}]];
 
         // Create marker for pickup location
-        //createMarker(pickupLat, pickupLng, "Pickup Location", "http://maps.google.com/mapfiles/ms/icons/blue-dot.png");
-        createMarker(pickupLat, pickupLng, "Pickup Location", "pickup.png");
+        createMarker(pickupLat, pickupLng, "Pickup Location", "http://maps.google.com/mapfiles/ms/icons/blue-dot.png");
 
         // Create marker for drop location
-        // createMarker(dropLat, dropLng, "Drop Location", "https://maps.google.com/mapfiles/marker_black.png");
-        createMarker(dropLat, dropLng, "Drop Location", null);
+        createMarker(dropLat, dropLng, "Drop Location", "https://maps.google.com/mapfiles/marker_black.png");
 
         // Create LatLng objects for pickup and drop locations
         var pickupLatLng = new google.maps.LatLng(pickupLat, pickupLng);
@@ -109,32 +106,21 @@
     }
 
     function createMarker(latitude, longitude, title, iconUrl) {
-        var marker;
-        if (iconUrl == null) {
-            marker = new google.maps.Marker({
-                position: {lat: latitude, lng: longitude},
-                map: map,
-                title: title,
-            });
-        } else {
-            var marker = new google.maps.Marker({
-                position: {lat: latitude, lng: longitude},
-                map: map,
-                title: title,
-                icon: {
-                    url: iconUrl,
-                    scaledSize: new google.maps.Size(32, 32)
-                }
-            });
-        }
-
-
+        var marker = new google.maps.Marker({
+            position: { lat: latitude, lng: longitude },
+            map: map,
+            title: title,
+            icon: {
+                url: iconUrl,
+                scaledSize: new google.maps.Size(32, 32)
+            }
+        });
         var bounds = new google.maps.LatLngBounds();
         bounds.extend(marker.getPosition());
         map.fitBounds(bounds);
     }
 
-    function updateMarkers(location, currentTripStatus) {
+    function updateMarkers(locationList) {
         var bounds = new google.maps.LatLngBounds(); // Create bounds object
 
         // Extend bounds with pickup and drop locations
@@ -147,29 +133,24 @@
         }
 
         // Add new markers
-        marker = new google.maps.Marker({
-            position: {
-                lat: location.latitude,
-                lng: location.longitude
-            },
-            icon: {
-                url: 'taxi.png',
-                scaledSize: new google.maps.Size(32, 32)
-            },
-            map: map
-            // title: "Location " + (i + 1)
-        });
-        bounds.extend(pickupLatLng);
-        bounds.extend(dropLatLng);
-        bounds.extend(marker.getPosition()); // Extend bounds with marker position
-
-        map.fitBounds(bounds); // Fit the map to the bounds
-        var driverLocation = new google.maps.LatLng(location.latitude, location.longitude);
-        var target = pickupLatLng;
-        if(currentTripStatus === "ongoing" || currentTripStatus === "completed") {
-            target = dropLatLng;
+        for (var i = 0; i < locationList.length; i++) {
+            var location = locationList[i];
+            var marker = new google.maps.Marker({
+                position: { lat: location.latitude, lng: location.longitude },
+                map: map,
+                title: "Location " + (i + 1)
+            });
+            bounds.extend(pickupLatLng);
+            bounds.extend(dropLatLng);
+            bounds.extend(marker.getPosition()); // Extend bounds with marker position
         }
-        calculateETA(driverLocation, target); // Pass driver's location and pickup location
+
+        if (locationList.length > 0) {
+            map.fitBounds(bounds); // Fit the map to the bounds
+            var loc = locationList[0];
+            var driverLocation = new google.maps.LatLng(loc.latitude, loc.longitude);
+            calculateETA(driverLocation, pickupLatLng); // Pass driver's location and pickup location
+        }
     }
 
 
@@ -177,18 +158,18 @@
         $.ajax({
             url: '/trip-status',
             method: 'GET',
-            data: {tripId: tripId},
+            data: { tripId: tripId },
             dataType: 'json',
-            success: function (response) {
+            success: function(response) {
                 var tripStatus = response;
                 var locationList = tripStatus.location;
                 var ride = tripStatus.ride;
                 if (locationList.length > 0) {
-                    updateMarkers(locationList[0], ride.rideStatus);
+                    updateMarkers(locationList);
                 }
                 showTripStatusMsg(ride.rideStatus);
             },
-            error: function (error) {
+            error: function(error) {
                 console.error('Error retrieving location history:', error);
             }
         });
@@ -219,10 +200,10 @@
             origin: origin,
             destination: destination,
             // travelMode: google.maps.TravelMode.WALKING
-            travelMode: google.maps.TravelMode.WALKING
+            travelMode: google.maps.TravelMode.DRIVING
         };
 
-        directionsService.route(request, function (response, status) {
+        directionsService.route(request, function(response, status) {
             if (status === google.maps.DirectionsStatus.OK) {
                 var route = response.routes[0];
                 var leg = route.legs[0];
@@ -234,7 +215,7 @@
                 // document.getElementById("eta").textContent = "ETA: " + etaText;
 
                 // Display route on the map
-                //directionsRenderer.setDirections(response);
+                directionsRenderer.setDirections(response);
             } else {
                 console.error('Error calculating ETA:', status);
             }
