@@ -18,7 +18,7 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public Booking bookCab(Booking booking) {
 
-        String insertQuery = "INSERT INTO CAB_BOOKING(USERNAME,PICK_UP,DROP_LOC,BOOK_DATE,BOOK_TIME,CAB_TYPE,BOOKING_ID,DRIVER,BOOK_STATUS,AMOUNT) VALUES (?, ?, ?, ?, ?, ?, ?, ?,?,?)";
+        String insertQuery = "INSERT INTO CAB_BOOKING(USERNAME,PICK_UP,DROP_LOC,BOOK_DATE,BOOK_TIME,CAB_TYPE,BOOKING_ID,DRIVER,BOOK_STATUS,AMOUNT,PAYMENT) VALUES (?, ?, ?, ?, ?, ?, ?, ?,?,?,?)";
         int rows=jdbcTemplate.update(insertQuery,
                 booking.getUsername(),
                 booking.getPickup(),
@@ -29,7 +29,8 @@ public class BookingServiceImpl implements BookingService {
                 booking.getId(),
                 booking.getDriverName(),
                 "upcoming",
-                booking.getAmount());
+                booking.getAmount(),
+        booking.getPaymentMethod());
 
         if(rows==1){
            if(booking.getPaymentMethod().equals("creditcard") ){
@@ -67,6 +68,21 @@ public class BookingServiceImpl implements BookingService {
         });
 
         return driver;
+    }
+
+    public Booking checkRide(Booking cab){
+
+        Booking user=new Booking();
+        String select_query="select * from CAB_BOOKING WHERE BOOK_STATUS IN ('upcoming','arrived') AND USERNAME=?;";
+        jdbcTemplate.query(select_query,new Object[]{cab.getUsername()},rs ->{
+
+            user.setId(rs.getString("BOOKING_ID"));
+            user.setCheck(false);
+
+        });
+
+
+        return user;
     }
 
 

@@ -11,6 +11,7 @@ import com.cab.booking.cab.dto.Booking;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Random;
+import com.cab.booking.cab.dto.User;
 
 @Controller
 public class BookingController {
@@ -19,14 +20,30 @@ public class BookingController {
     private BookingService BookingService;
 
     @RequestMapping("/bookCab")
-    public String bookCab() {
+    public String bookCab(HttpServletRequest request, Model model) {
+        Booking cab = new Booking();
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if(cookie.getName().equals("name")) {
+                   cab.setUsername(cookie.getValue());;
+                }
+            }
+        }
 
-        return "Bookingcab.html";
+        Booking user=BookingService.checkRide(cab);
+        if(user.isCheck()){
+            return "Bookingcab.html";
+        }else{
+            return "multipleCab.html";
+        }
+
     }
 
     @RequestMapping(path = "/cab-details", method = RequestMethod.POST)
     public String getCab(HttpServletRequest request, Model model) {
 
+        User user=new User();
         Booking cab = new Booking();
         Cookie[] cookies = request.getCookies();
         if (cookies != null) {

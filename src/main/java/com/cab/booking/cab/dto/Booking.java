@@ -19,6 +19,7 @@ public class Booking {
     private String payment;
     private String feedback;
     private String amount;
+    private boolean check=true;
 
 
     public Booking() {
@@ -158,6 +159,14 @@ public class Booking {
 
     public void setAmount(String amount) {
         this.amount = amount;
+    }
+
+    public boolean isCheck() {
+        return check;
+    }
+
+    public void setCheck(boolean check) {
+        this.check = check;
     }
 
     public int getRating(String bookingId) {
