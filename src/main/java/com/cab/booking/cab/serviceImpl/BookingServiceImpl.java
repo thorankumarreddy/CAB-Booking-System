@@ -60,7 +60,7 @@ public class BookingServiceImpl implements BookingService {
 
         });
 
-        String query="SELECT AVG(RATING) AS average_rating FROM FEEDBACK WHERE DRIVER=? GROUP BY DRIVER;";
+        String query="SELECT ROUND(AVG(RATING), 2) AS average_rating FROM FEEDBACK WHERE DRIVER=? GROUP BY DRIVER;";
         jdbcTemplate.query(query,new Object[]{driver.getDriverName()},rs ->{
 
             driver.setFeedback(rs.getString("average_rating"));
