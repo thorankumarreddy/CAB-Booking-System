@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        body {
+            font-family: "Times New Roman", Times, serif;
+        }
+
+        .sidenav {
+            height: 100%;
+            width: 250px;
+            position: fixed;
+            z-index: 1;
+            top: 0;
+            left: 0;
+            background-color: #cddc39;
+            overflow-x: hidden;
+            padding-top: 300px;
+        }
+
+        .sidenav a {
+            padding: 16px 18px 16px 20px;
+            text-decoration: none;
+            font-size: 25px;
+            color: #673ab7;
+            display: block;
+        }
+
+        .sidenav a:hover {
+            color: #f1f1f1;
+        }
+
+
+        @media screen and (max-height: 450px) {
+            .sidenav {padding-top: 15px;}
+            .sidenav a {font-size: 18px;}
+        }
+        .bg-img {
+            /* The image used */
+            background-image: url("https://img.freepik.com/free-vector/taxi-app-concept-illustration_52683-36028.jpg?size=626&ext=jpg");
+
+            /* Control the height of the image */
+            min-height: 900px;
+            margin-left: 240px;
+
+
+            /* Center and scale the image nicely */
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+            position: relative;
+
+        }
+    </style>
+</head>
+<body>
+
+<div class="sidenav">
+    <a href="/registration">New User?</a>
+    <a href="/login">Already an User?</a>
+    <a href="/logindriver">Driver Login</a>
+</div>
+
+<div class="bg-img">
+
+</div>
+
+</body>
+</html>

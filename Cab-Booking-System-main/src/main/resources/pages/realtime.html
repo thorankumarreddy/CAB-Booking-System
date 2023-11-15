@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Live Location Changes</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+<h1>Live Location Changes</h1>
+<div id="locationUpdates"></div>
+
+<script>
+    $(document).ready(function() {
+        // Check if the Geolocation API is available
+        if ("geolocation" in navigator) {
+            // Watch for changes in the user's location
+            var watchId = navigator.geolocation.watchPosition(successCallback, errorCallback);
+        } else {
+            $("#locationUpdates").text("Geolocation is not supported by this browser.");
+        }
+
+        function successCallback(position) {
+            var latitude = position.coords.latitude;
+            var longitude = position.coords.longitude;
+            var timestamp = new Date(position.timestamp).toLocaleString();
+
+            // Append the location changes to the div
+            var locationUpdate = "<p>Latitude: " + latitude + ", Longitude: " + longitude + ", Timestamp: " + timestamp + "</p>";
+            $("#locationUpdates").append(locationUpdate);
+        }
+
+        function errorCallback(error) {
+            switch (error.code) {
+                case error.PERMISSION_DENIED:
+                    $("#locationUpdates").text("User denied the request for Geolocation.");
+                    break;
+                case error.POSITION_UNAVAILABLE:
+                    $("#locationUpdates").text("Location information is unavailable.");
+                    break;
+                case error.TIMEOUT:
+                    $("#locationUpdates").text("The request to get user location timed out.");
+                    break;
+                case error.UNKNOWN_ERROR:
+                    $("#locationUpdates").text("An unknown error occurred.");
+                    break;
+            }
+        }
+    });
+</script>
+</body>
+</html>

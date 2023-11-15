@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Customer Feedback</title>
+  <style>
+
+    .star-rating i {
+      opacity: 0;
+      position: absolute;
+      left: 0;
+      top: 0;
+      height: 100%;
+      width: 20%;
+      z-index: 1;
+      background: url('data:image/svg+xml;base64,PHN2ZyB2ZXJzaW9uPSIxLjEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4IiB3aWR0aD0iMjBweCIgaGVpZ2h0PSIyMHB4IiB2aWV3Qm94PSIwIDAgMjAgMjAiIGVuYWJsZS1iYWNrZ3JvdW5kPSJuZXcgMCAwIDIwIDIwIiB4bWw6c3BhY2U9InByZXNlcnZlIj48cG9seWdvbiBmaWxsPSIjRkZERjg4IiBwb2ludHM9IjEwLDAgMTMuMDksNi41ODMgMjAsNy42MzkgMTUsMTIuNzY0IDE2LjE4LDIwIDEwLDE2LjU4MyAzLjgyLDIwIDUsMTIuNzY0IDAsNy42MzkgNi45MSw2LjU4MyAiLz48L3N2Zz4=');
+      background-size: contain;
+    }
+    .star-rating input:hover + i,
+    .star-rating input:checked + i {
+      opacity: 1;
+    }
+    .star-rating i ~ i {
+      width: 40%;
+    }
+    .star-rating i ~ i ~ i {
+      width: 60%;
+    }
+    .star-rating i ~ i ~ i ~ i {
+      width: 80%;
+    }
+    .star-rating i ~ i ~ i ~ i ~ i {
+      width: 100%;
+    }
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    .feedback-form {
+      margin-bottom: 20px;
+    }
+    .feedback-form textarea {
+      width: 100%;
+      height: 100px;
+    }
+    .rating {
+      margin-bottom: 10px;
+    }
+    .rating input[type="radio"] {
+      display: none;
+    }
+    .rating label {
+      display: inline-block;
+      cursor: pointer;
+      color: #ddd;
+      font-size: 24px;
+    }
+    .rating label:before {
+      content: "\2605";
+      margin-right: 5px;
+    }
+    .rating input[type="radio"]:checked ~ label {
+      color: #ffca08;
+    }
+  </style>
+</head>
+<body>
+
+
+<div class="container">
+  <form class="feedback"  action="/submitFeedback" method="POST">
+  <h1>Customer Feedback</h1>
+  <div class="feedback-form">
+    <h2>Booking ID:</h2>
+    <input type="text" placeholder="Enter the Booking Id" name="bookid" required>
+  </div>
+
+  <div class="feedback-form">
+    <h2>Leave your feedback:</h2>
+    <textarea name="feedback-text" placeholder="Enter your feedback"  required></textarea>
+  </div>
+
+  <div class="rating">
+    <h2>Rate your experience for Driver:</h2>
+    <div style="display:inline-flex; direction: rtl;">
+      <input type="radio" id="star1" name="rating" value="1">
+      <label for="star1"></label>
+      <input type="radio" id="star2" name="rating" value="2">
+      <label for="star2"></label>
+      <input type="radio" id="star3" name="rating" value="3">
+      <label for="star3"></label>
+      <input type="radio" id="star4" name="rating" value="4">
+      <label for="star4"></label>
+      <input type="radio" id="star5" name="rating" value="5">
+      <label for="star5"></label>
+    </div>
+    <br/>
+    <br/>
+    <button >Submit</button>
+  </div>
+  </form>
+</div>
+
+
+</body>
+</html>
+

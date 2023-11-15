@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Location History</title>
+</head>
+<style>
+    #map {
+        height: 400px;
+        width: 100%;
+    }
+</style>
+
+<body>
+<h1>Location History</h1>
+<div id="map"></div>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAYg2oLfY0q0bLZTUGS--yAPsfWVw-l7Pw&libraries=visualization"></script>
+
+<script>
+
+    var tripId = getQueryParam('tripId'); // Retrieve the tripId from URL parameter
+
+    function getQueryParam(param) {
+        var urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get(param);
+    }
+
+
+
+    $(document).ready(function() {
+        var map;
+        var heatmap;
+        var heatmapData = [];
+
+        function initMap() {
+            map = new google.maps.Map(document.getElementById('map'), {
+                center: {lat: 0, lng: 0},
+                zoom: 1
+            });
+
+            tripheatmap = new google.maps.visualization.HeatmapLayer({
+                data: heatmapData,
+                map: map,
+                radius: 20
+            });
+        }
+
+        function updateHeatmap(locations) {
+            heatmapData = [];
+
+            for (var i = 0; i < locations.length; i++) {
+                var location = locations[i];
+                var latitude = location.latitude;
+                var longitude = location.longitude;
+                var latLng = new google.maps.LatLng(latitude, longitude);
+                heatmapData.push(latLng);
+            }
+
+            tripheatmap.setData(heatmapData);
+        }
+
+        function getLocationHistory() {
+            $.ajax({
+                url: '/get-location-history?tripId=' + tripId, // Replace with your actual backend API endpoint
+                method: 'GET',
+                success: function(response) {
+                    var locationList = response;
+
+                    if (locationList.length > 0) {
+                        updateHeatmap(locationList);
+                    }
+                },
+                error: function(error) {
+                    console.error('Error retrieving location history:', error);
+                }
+            });
+        }
+
+        initMap();
+
+        setInterval(function() {
+            getLocationHistory();
+        }, 5000);
+    });
+
+
+</script>
+
+
+</body>
+</html>

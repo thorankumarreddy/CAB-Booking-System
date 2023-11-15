@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Location Tracking</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+
+    <style>
+        #map {
+            height: 600px;
+            width: 80%;
+            margin: 0 auto;
+        }
+
+        body {
+            padding-top:20px;
+        }
+
+    </style>
+
+</head>
+<body style="text-align: center;">
+<h2> Welcome [[${driver.drivername}]]...You have a ride with booking Id :[[${driver.bookId}]] </h2>
+
+<div class="details">
+
+    <p>Booking ID : [[${driver.bookId}]]</p>
+    <p>Ride Status : [[${driver.rideStatus}]]</p>
+    <p>Pick up latitude : [[${driver.pickLat}]]</p>
+    <p>Pick up longitude : [[${driver.pickLong}]]</p>
+    <p>Drop latitude : [[${driver.dropLat}]]</p>
+    <p>Drop Longitude : [[${driver.dropLong}]]</p>
+    <p id="tripStatusMsg" class="text-info"></p>
+
+</div>
+
+<button class="btn btn-primary" id="arrived" onclick="sendAjaxRequest(statusUpdateUrl, 'arrived')">Arrived</button>
+<button class="btn btn-warning" id="ongoing" style="display:none;"
+        onclick="sendAjaxRequest(statusUpdateUrl, 'ongoing')">Start Trip
+</button>
+<button class="btn btn-success" id="completed" style="display:none;"
+        onclick="sendAjaxRequest(statusUpdateUrl, 'completed')">Complete Trip
+</button>
+<button class="btn btn-secondary" disabled id="done" style="display:none;">Trip Done</button>
+
+<br>
+
+
+<p id="eta" class="text-primary" style="display:none;">Estimated Time of Arrival (ETA): </p>
+
+<br>
+<br>
+
+<div id="map"></div>
+
+<h3>Driver Location Updates</h3>
+
+
+
+<div id="locationUpdates"></div>
+
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAYg2oLfY0q0bLZTUGS--yAPsfWVw-l7Pw&callback=initMap" async
+        defer></script>
+
+<script>
+    var map;
+    var marker;
+    var directionsService;
+    var directionsRenderer;
+
+    var previousLocation = null;
+    var statusUpdateUrl = '/status-Update';
+    var currentTripStatus = "upcoming";
+    //changes by manju--commented
+    //var tripId = getQueryParam('tripId'); // Retrieve the tripId from URL parameter
+    // var status = getQueryParam('status');
+    // var driver = getQueryParam('driver');
+    // function getQueryParam(param) {
+    //     var urlParams = new URLSearchParams(window.location.search);
+    //     return urlParams.get(param);
+    // }
+
+
+    //added by manju for status update
+    function sendAjaxRequest(urlToSend, tripStatus) {
+        // var clickedButton = element;
+        // console.log('clickedButton value is');
+        // console.log(element);
+        $.ajax({
+            type: "POST",
+            url: urlToSend,
+            data: {
+                status: tripStatus,
+                tripId: tripId,
+                driver: driver
+            },
+            success: function (result) {
+                // alert('ok');
+                showStatusButtons(tripStatus);
+                showTripStatusMsg(tripStatus);
+            },
+            error: function (error) {
+                alert('error');
+            }
+        });
+    }
+
+
+    var tripId = [[${driver.bookId}]];
+    var status = "[[${driver.rideStatus}]]";
+    var driver = "[[${driver.drivername}]]";
+    var pickLat = [[${driver.pickLat}]];
+    var pickLong = [[${driver.pickLong}]];
+    var dropLat = [[${driver.dropLat}]];
+    var dropLong = [[${driver.dropLong}]];
+
+
+    function initMap() {
+        var mapOptions = {
+            center: {lat: 0, lng: 0},
+            zoom: 10,
+            mapId: 'f59bf37bc81d63ab'
+        };
+        map = new google.maps.Map(document.getElementById('map'), mapOptions);
+
+        // Retrieve pickup and drop latitude and longitude
+
+        // Create marker for pickup location
+        //createMarker(pickLat, pickLong, "Pickup Location", "http://maps.google.com/mapfiles/ms/icons/blue-dot.png");
+        createMarker(pickLat, pickLong, "Pickup Location", "pickup.png");
+        // Create marker for drop location
+        createMarker(dropLat, dropLong, "Drop Location", null);
+
+        // Create LatLng objects for pickup and drop locations
+        var pickupLatLng = new google.maps.LatLng(pickLat, pickLong);
+        var dropLatLng = new google.maps.LatLng(dropLat, dropLong);
+
+        // Initialize directions service and renderer
+        directionsService = new google.maps.DirectionsService();
+        directionsRenderer = new google.maps.DirectionsRenderer({
+            map: map,
+            suppressMarkers: true // Suppress default markers
+        });
+
+
+        // Extend bounds with pickup and drop locations
+        var bounds = new google.maps.LatLngBounds();
+        bounds.extend(pickupLatLng);
+        bounds.extend(dropLatLng);
+
+        // Fit the map to the bounds
+        map.fitBounds(bounds);
+
+    }
+
+
+    function createMarker(latitude, longitude, title, iconUrl) {
+        var marker;
+        if (iconUrl == null) {
+            marker = new google.maps.Marker({
+                position: {lat: latitude, lng: longitude},
+                map: map,
+                title: title,
+            });
+        } else {
+            var marker = new google.maps.Marker({
+                position: {lat: latitude, lng: longitude},
+                map: map,
+                title: title,
+                icon: {
+                    url: iconUrl,
+                    scaledSize: new google.maps.Size(32, 32)
+                }
+            });
+        }
+
+
+        var bounds = new google.maps.LatLngBounds();
+        bounds.extend(marker.getPosition());
+        map.fitBounds(bounds);
+    }
+
+    // Function to send AJAX request and save location data
+    function saveLocation(latitude, longitude, tripId) {
+        var locationData = {
+            latitude: latitude,
+            longitude: longitude,
+            tripId: tripId
+        };
+
+        // Check if the location has changed
+        if (
+            !previousLocation ||
+            previousLocation.latitude !== locationData.latitude ||
+            previousLocation.longitude !== locationData.longitude ||
+            previousLocation.tripId !== locationData.tripId
+        ) {
+            // AJAX request to the backend API
+            $.ajax({
+                url: '/save-location', // Replace with your actual backend API endpoint
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(locationData),
+                success: function (response) {
+                    console.log('Location data saved successfully!');
+                    previousLocation = locationData; // Update previous location
+                    updateMarkers(locationData)
+                },
+                error: function (error) {
+                    console.error('Error saving location data:', error);
+                }
+            });
+        }
+    }
+
+    function updateMarkers(location) {
+        var bounds = new google.maps.LatLngBounds(); // Create bounds object
+
+        // Extend bounds with pickup and drop locations
+        var pickupLatLng = new google.maps.LatLng(pickLat, pickLong);
+        var dropLatLng = new google.maps.LatLng(dropLat, dropLong);
+
+        // Remove previous markers
+        if (marker) {
+            marker.setMap(null);
+        }
+
+        // Add new markers
+        marker = new google.maps.Marker({
+            position: {
+                lat: location.latitude,
+                lng: location.longitude
+            },
+            icon: {
+                url: 'taxi.png',
+                scaledSize: new google.maps.Size(32, 32)
+            },
+            map: map
+            // title: "Location " + (i + 1)
+        });
+        bounds.extend(pickupLatLng);
+        bounds.extend(dropLatLng);
+        bounds.extend(marker.getPosition()); // Extend bounds with marker position
+
+        map.fitBounds(bounds); // Fit the map to the bounds
+        var driverLocation = new google.maps.LatLng(location.latitude, location.longitude);
+        var target = pickupLatLng;
+        if(currentTripStatus === "ongoing" || currentTripStatus === "completed") {
+            target = dropLatLng;
+        }
+        calculateETA(driverLocation, target); // Pass driver's location and pickup location
+    }
+
+
+    function calculateETA(origin, destination) {
+        var request = {
+            origin: origin,
+            destination: destination,
+            travelMode: google.maps.TravelMode.WALKING
+            //travelMode: google.maps.TravelMode.DRIVING
+        };
+
+        directionsService.route(request, function (response, status) {
+            if (status === google.maps.DirectionsStatus.OK) {
+                var route = response.routes[0];
+                var leg = route.legs[0];
+                var etaText = leg.duration.text;
+
+                $("#eta").text("Estimated Time of Arrival (ETA): " + etaText)
+                $("#eta").show();
+                // Display ETA on the page
+                // document.getElementById("eta").textContent = "ETA: " + etaText;
+
+                // Display route on the map
+                directionsRenderer.setDirections(response);
+            } else {
+                console.error('Error calculating ETA:', status);
+            }
+        });
+    }
+
+
+    // Function to track location changes
+    function trackLocation() {
+        if (navigator.geolocation) {
+            navigator.geolocation.watchPosition(
+                function (position) {
+                    var latitude = position.coords.latitude;
+                    var longitude = position.coords.longitude;
+                    $('#locationUpdates').append('<p>Latitude: ' + latitude + ', Longitude: ' + longitude + ', TripId: ' + tripId + '</p>');
+                    // Call the function to save the location data
+                    saveLocation(latitude, longitude, tripId);
+
+                },
+                function (error) {
+                    console.error('Error getting location:', error);
+                }
+            );
+        } else {
+            console.error('Geolocation is not supported by this browser.');
+        }
+    }
+
+
+    // Start tracking location when the page loads
+    $(document).ready(function () {
+        trackLocation();
+        var rideStatus = "[[${driver.rideStatus}]]";
+        showStatusButtons(rideStatus);
+        showTripStatusMsg(rideStatus);
+    });
+
+    function showStatusButtons(tripStatus) {
+        // Show/hide buttons based on the ride status
+        if (tripStatus === "upcoming") {
+            $("#arrived").show();
+            $("#ongoing").hide();
+            $("#completed").hide();
+        } else if (tripStatus === "arrived") {
+            currentTripStatus = "arrived";
+            $("#arrived").hide();
+            $("#ongoing").show();
+            $("#completed").hide();
+        } else if (tripStatus === "ongoing") {
+            currentTripStatus = "ongoing";
+            $("#arrived").hide();
+            $("#ongoing").hide();
+            $("#completed").show();
+        } else if (tripStatus === "completed") {
+            currentTripStatus = "completed";
+            $("#arrived").hide();
+            $("#ongoing").hide();
+            $("#completed").hide();
+            $("#done").show();
+        } else {
+            $("#arrived").hide();
+            $("#ongoing").hide();
+            $("#completed").hide();
+        }
+    }
+
+    function showTripStatusMsg(tripStatus) {
+        var tripStatusMsg = $("#tripStatusMsg");
+        if (tripStatus === "upcoming") {
+            // Display message for upcoming trip
+            tripStatusMsg.text("Your next trip is upcoming. Please prepare for pickup.");
+        } else if (tripStatus === "arrived") {
+            // Display message for driver arrival
+            tripStatusMsg.text("You have arrived at the pickup location. Please wait for the passenger.");
+        } else if (tripStatus === "ongoing") {
+            // Display message for ongoing trip
+            tripStatusMsg.text("You are currently on a trip. Drive safely and follow the navigation instructions.");
+        } else if (tripStatus === "completed") {
+            // Display message for completed trip
+            tripStatusMsg.text("You have completed the trip. Thank you for driving with us!");
+        } else {
+            // Handle invalid ride status
+            tripStatusMsg.text("Invalid ride status. Please contact customer support.");
+        }
+    }
+
+
+
+</script>
+
+</body>
+</html>
